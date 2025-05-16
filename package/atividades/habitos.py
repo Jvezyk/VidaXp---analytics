@@ -6,8 +6,8 @@ class Habito(Atividade):
         self.frequencia = frequencia  # ex: 'diário', 'semanal'
     
     def concluir(self):
-        # Para hábito, não fecha status, pode registrar múltiplas vezes
-        print(f"Hábito '{self.titulo}' marcado como cumprido!")
+         # Para hábito, não fecha status, pode registrar múltiplas vezes
+         print(f"Hábito: '{self.titulo}' marcado como cumprido!")
     
     def __str__(self):
-        return f"Hábito: {super().__str__()} - Frequência: {self.frequencia}"
+         return f"Hábito: {super().__str__()} - Frequência: {self.frequencia}"
