@@ -24,12 +24,12 @@ class Usuario:
 
     def salvar_json(self, caminho):
         dados = {
-            "Nome": self.nome,
+            "nome": self.nome,
             "tarefas": [
                 {
                     "titulo": t.titulo,
                     "status": t.status,
-                    "data_criacao": t.data_crição.isoformat(),
+                    "data_criacao": t.data_criacao.isoformat(),
                     "data_entrega": t.data_entrega.isoformat()
                 } for t in self.tarefas
             ],
@@ -38,7 +38,7 @@ class Usuario:
                     "titulo": h.titulo,
                     "status": h.status,
                     "data_criacao": h.data_criacao.isoformat(),
-                    "data_entrega": h.data_entrega.isoformat()
+                    "frequencia": h.frequencia
                 } for h in self.habitos
             ]
         }
