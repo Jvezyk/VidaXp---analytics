@@ -3,13 +3,10 @@ from package.atividades.atividade import Atividade
 
 
 class Tarefa(Atividade):
-    def __init__(self, titulo: str, data_entrega: datetime):
-        super().__init__(titulo)
-        self.data_entrega = data_entrega
+    def __init__(self, titulo, data_entrega=None, status='pendente'):
+        super().__init__(titulo, status)
+        self.data_entrega = data_entrega or datetime.now()
 
     def concluir(self):
-        print(f"Tarefa: '{self.titulo}' concluída!")
-
-    def __str__(self):
-        return f"Tarefa: {super().__str__()} - Prazo: {self.data_entrega.strftime('%d/%m/%Y')}"
+        self.status = 'concluída'
 
