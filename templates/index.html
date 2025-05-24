@@ -71,8 +71,8 @@
           {{ t.titulo }}
         </span>
         <div>
-          <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm"
-            title="Concluir"><i class="bi bi-check-lg"></i></a>
+          <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm" title="Concluir"><i
+              class="bi bi-check-lg"></i></a>
           <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
             title="Remover"><i class="bi bi-trash"></i></a>
         </div>
@@ -127,10 +127,10 @@
         </span>
         <div>
           {% if h.status == 'pendente' %}
-          <a href="{{ url_for('concluir_habito', id=t.id) }}" class="btn btn-outline-success btn-sm"
-            title="Concluir"><i class="bi bi-check-lg"></i></a>
+          <a href="{{ url_for('concluir_habito', id=h.id) }}" class="btn btn-outline-success btn-sm" title="Concluir"><i
+              class="bi bi-check-lg"></i></a>
           {% endif %}
-          <a href="{{ url_for('remover_habito', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+          <a href="{{ url_for('remover_habito', id=h.id) }}" class="btn btn-outline-danger btn-sm ms-1"
             title="Remover"><i class="bi bi-trash"></i></a>
         </div>
       </li>
