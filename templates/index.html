@@ -1,55 +1,68 @@
-<!-- index.html -->
 {% extends "base.html" %}
 {% block content %}
-<div class="row g-4">
-  <!-- Tarefas -->
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Tarefas</h5>
-        <form action="/adicionar_tarefa" method="POST" class="d-inline-flex">
-          <input name="titulo" class="form-control form-control-sm me-2" placeholder="Nova tarefa" required>
-          <button class="btn btn-light btn-sm">Adicionar</button>
-        </form>
-      </div>
-      <ul class="list-group list-group-flush">
-        {% for t in usuario.tarefas %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ t.titulo }} - <small class="text-muted">{{ t.status }}</small></span>
-          {% if t.status == 'pendente' %}
-          <a href="/concluir_tarefa/{{ loop.index0 }}" class="btn btn-success btn-sm">Concluir</a>
-          {% endif %}
-        </li>
-        {% else %}
-        <li class="list-group-item text-muted">Nenhuma tarefa adicionada.</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+<div class="container py-5">
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link {% if aba == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Início</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if aba == 'tarefas' %}active{% endif %}" href="{{ url_for('tarefas') }}">Tarefas</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if aba == 'habitos' %}active{% endif %}" href="{{ url_for('habitos') }}">Hábitos</a>
+    </li>
+  </ul>
 
-  <!-- Hábitos -->
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Hábitos</h5>
-        <form action="/adicionar_habito" method="POST" class="d-inline-flex">
-          <input name="titulo" class="form-control form-control-sm me-2" placeholder="Novo hábito" required>
-          <button class="btn btn-light btn-sm">Adicionar</button>
-        </form>
+  {% if aba == 'dashboard' %}
+  <!-- Conteúdo do dashboard, gráficos, etc -->
+  <h2>Bem-vindo ao VidaXP!</h2>
+  <p>Veja seu progresso e navegue pelas abas acima.</p>
+  {% elif aba == 'tarefas' %}
+  <!-- Conteúdo de tarefas -->
+  <h2>Tarefas</h2>
+  <form action="{{ url_for('adicionar_tarefa') }}" method="POST" class="mb-3 d-flex gap-2">
+    <input name="titulo" class="form-control" placeholder="Nova tarefa" required>
+    <button class="btn btn-primary">Adicionar</button>
+  </form>
+  <ul class="list-group">
+    {% for t in usuario.tarefas %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span {% if t.status=='concluída' %}class="text-decoration-line-through text-success" {% endif %}>{{ t.titulo
+        }}</span>
+      <div>
+        {% if t.status == 'pendente' %}
+        <a href="{{ url_for('concluir_tarefa', index=loop.index0) }}" class="btn btn-success btn-sm">Concluir</a>
+        {% endif %}
+        <a href="{{ url_for('remover_tarefa', index=loop.index0) }}" class="btn btn-danger btn-sm">Remover</a>
       </div>
-      <ul class="list-group list-group-flush">
-        {% for h in usuario.habitos %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ h.titulo }} - <small class="text-muted">{{ h.status }}</small></span>
-          {% if h.status == 'pendente' %}
-          <a href="/concluir_habito/{{ loop.index0 }}" class="btn btn-success btn-sm">Concluir</a>
-          {% endif %}
-        </li>
-        {% else %}
-        <li class="list-group-item text-muted">Nenhum hábito adicionado.</li>
-        {% endfor %}
-      </ul>
-    </div>
-  </div>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted text-center">Nenhuma tarefa adicionada.</li>
+    {% endfor %}
+  </ul>
+  {% elif aba == 'habitos' %}
+  <!-- Conteúdo de hábitos -->
+  <h2>Hábitos</h2>
+  <form action="{{ url_for('adicionar_habito') }}" method="POST" class="mb-3 d-flex gap-2">
+    <input name="titulo" class="form-control" placeholder="Novo hábito" required>
+    <button class="btn btn-success">Adicionar</button>
+  </form>
+  <ul class="list-group">
+    {% for h in usuario.habitos %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span {% if h.status=='concluído' %}class="text-decoration-line-through text-success" {% endif %}>{{ h.titulo
+        }}</span>
+      <div>
+        {% if h.status == 'pendente' %}
+        <a href="{{ url_for('concluir_habito', index=loop.index0) }}" class="btn btn-success btn-sm">Concluir</a>
+        {% endif %}
+        <a href="{{ url_for('remover_habito', index=loop.index0) }}" class="btn btn-danger btn-sm">Remover</a>
+      </div>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted text-center">Nenhum hábito adicionado.</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
 </div>
 {% endblock %}
