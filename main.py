@@ -42,6 +42,25 @@ def main():
             print("\n--- Hábitos ---")
             for h in user.habitos:
                 print(h)
+            alterar = input("\nDeseja alterar alguma coisa? (s/n): ")
+            if alterar.lower() == 's':
+                escolha = input("Escolha oque alterar: (Tarefa/Habito): ").strip().lower()
+                if escolha == 'tarefa':
+                    if not user.tarefas:
+                        print("não há tarefas para alterar.")
+                    else:
+                        for idx, t in enumerate(user.tarefas):
+                            print(f"{idx + 1}. {t}")
+                        num = input("Digite o número da tarefa que deseja marcar como concluída: ")
+                        if num.isdigit() and 1 <= int(num) <= len(user.tarefas):
+                            tarefa_concluida = user.tarefas.pop(int(num) - 1)
+                            print(f"Tarefa '{tarefa_concluida}' marcada como concluida com sucesso!")
+                        else:
+                            print("Número inválido.")
+                elif escolha == 'habito':
+                    print("Estamos preparando isso ainda...")
+                else:
+                    print("Opção inválida")
         elif opcao == "4":
             user.salvar_json(caminho)
             print("Dados salvos! Até logo!")

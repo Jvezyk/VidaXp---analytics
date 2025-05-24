@@ -54,7 +54,7 @@ class Usuario:
             tarefa = Tarefa(
                 t["titulo"],
                 datetime.fromisoformat(t["data_entrega"])
-            )
+)
             tarefa.status = t["status"]
             tarefa.data_criacao = datetime.fromisoformat(t["data_criacao"])
             usuario.adicionar_tarefa(tarefa)
