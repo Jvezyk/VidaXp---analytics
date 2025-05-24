@@ -1,0 +1,55 @@
+<!-- index.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+  <!-- Tarefas -->
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Tarefas</h5>
+        <form action="/adicionar_tarefa" method="POST" class="d-inline-flex">
+          <input name="titulo" class="form-control form-control-sm me-2" placeholder="Nova tarefa" required>
+          <button class="btn btn-light btn-sm">Adicionar</button>
+        </form>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for t in usuario.tarefas %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ t.titulo }} - <small class="text-muted">{{ t.status }}</small></span>
+          {% if t.status == 'pendente' %}
+          <a href="/concluir_tarefa/{{ loop.index0 }}" class="btn btn-success btn-sm">Concluir</a>
+          {% endif %}
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted">Nenhuma tarefa adicionada.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hábitos -->
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Hábitos</h5>
+        <form action="/adicionar_habito" method="POST" class="d-inline-flex">
+          <input name="titulo" class="form-control form-control-sm me-2" placeholder="Novo hábito" required>
+          <button class="btn btn-light btn-sm">Adicionar</button>
+        </form>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for h in usuario.habitos %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ h.titulo }} - <small class="text-muted">{{ h.status }}</small></span>
+          {% if h.status == 'pendente' %}
+          <a href="/concluir_habito/{{ loop.index0 }}" class="btn btn-success btn-sm">Concluir</a>
+          {% endif %}
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted">Nenhum hábito adicionado.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
