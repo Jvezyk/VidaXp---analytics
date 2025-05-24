@@ -15,6 +15,7 @@ class Tarefa(db.Model):
     titulo = db.Column(db.String(120), nullable=False)
     status = db.Column(db.String(20), default='pendente')
     data_entrega = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
     def concluir(self):
         self.status = 'concluída'
 
