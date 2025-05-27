@@ -30,9 +30,9 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 ## 🧱 Estrutura do Projeto
 ```
 VidaXp---analytics/
-├── app.py # Aplicação principal (Flask)
-├── README.md # Documentação do projeto
-├── requirements.txt # Dependências
+├── main.py   # Aplicação principal (Flask)
+├── README.md  # Documentação do projeto
+├── requirements.txt  # Dependências
 │
 ├── templates/ # HTML (interface com usuário)
 │ ├── base.html
@@ -54,5 +54,9 @@ VidaXp---analytics/
 ---
 
 ## Para instalar as bibliotecas necessarias 
-*Bash:*
+
+`Bash:`
+
+```
 pip install -r requirements.txt
+```
