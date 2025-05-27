@@ -4,7 +4,7 @@ Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**,
 
 ---
 
-## 🎯 Objetivo
+##  Objetivo
 
 O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
@@ -15,7 +15,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
 ---
 
-## 🧠 Conceitos de Orientação a Objetos aplicados
+##  Conceitos de Orientação a Objetos aplicados
 
 | Conceito OO       | Aplicação no Projeto                    |
 |-------------------|------------------------------------------|
@@ -27,7 +27,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
 ---
 
-## 🧱 Estrutura do Projeto
+##  Estrutura do Projeto
 ```
 VidaXp---analytics/
 ├── main.py   # Aplicação principal (Flask)
