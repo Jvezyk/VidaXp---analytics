@@ -29,7 +29,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
 ## 🧱 Estrutura do Projeto
 
-<pre> ``` VidaXp---analytics/ ├── app.py # Aplicação principal (Flask) ├── README.md # Documentação do projeto ├── requirements.txt # Dependências │ ├── templates/ # HTML (interface com usuário) │ ├── base.html │ └── index.html │ ├── static/ # CSS customizado │ └── style.css │ ├── package/ # Lógica do sistema (orientado a objetos) │ ├── usuario.py │ └── atividades/ │ ├── atividade.py │ ├── tarefa.py │ └── habito.py │ ├── instance/ # Banco de dados local(SQL) │ └── vidaxp.db ``` </pre> 
+ ``` VidaXp---analytics/ ├── app.py # Aplicação principal (Flask) ├── README.md # Documentação do projeto ├── requirements.txt # Dependências │ ├── templates/ # HTML (interface com usuário) │ ├── base.html │ └── index.html │ ├── static/ # CSS customizado │ └── style.css │ ├── package/ # Lógica do sistema (orientado a objetos) │ ├── usuario.py │ └── atividades/ │ ├── atividade.py │ ├── tarefa.py │ └── habito.py │ ├── instance/ # Banco de dados local(SQL) │ └── vidaxp.db ```  
 
 ---
 
