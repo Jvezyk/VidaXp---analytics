@@ -10,17 +10,20 @@ body {
   min-width: 200px;
   background: #22223b;
   color: #fff;
-  box-shadow: 2px 0 16px rgba(34,34,59,0.07);
+  box-shadow: 2px 0 16px rgba(34, 34, 59, 0.07);
 }
+
 .sidebar h2 {
   font-weight: 700;
   letter-spacing: 1px;
 }
+
 .sidebar .nav-link {
   color: #bfc0c0;
   border-radius: 0.5rem;
   transition: background 0.2s, color 0.2s;
 }
+
 .sidebar .nav-link.active,
 .sidebar .nav-link:hover {
   background: #4a4e69;
@@ -30,36 +33,45 @@ body {
 /* Cards */
 .card {
   border-radius: 1.5rem;
-  box-shadow: 0 6px 32px rgba(34,34,59,0.09);
+  box-shadow: 0 6px 32px rgba(34, 34, 59, 0.09);
 }
+
 .card-header {
   border-radius: 1.5rem 1.5rem 0 0;
   font-weight: 600;
   letter-spacing: 0.5px;
   font-size: 1.1rem;
 }
+
 .list-group-item {
   border: none;
   border-bottom: 1px solid #f0f0f0;
   background: transparent;
 }
+
 .list-group-item:last-child {
   border-bottom: none;
 }
 
 /* Inputs e botões */
-input.form-control, input.form-control-sm {
+input.form-control,
+input.form-control-sm {
   border-radius: 0.7rem;
   border: 1px solid #dee2e6;
   font-size: 1rem;
 }
-button.btn, button.btn-sm {
+
+button.btn,
+button.btn-sm {
   border-radius: 0.7rem;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
-button.btn-light:hover, .btn-outline-success:hover, .btn-outline-danger:hover {
+
+button.btn-light:hover,
+.btn-outline-success:hover,
+.btn-outline-danger:hover {
   filter: brightness(0.95);
-  box-shadow: 0 2px 8px rgba(34,34,59,0.07);
+  box-shadow: 0 2px 8px rgba(34, 34, 59, 0.07);
 }
 
 /* Tarefas e hábitos concluídos */
@@ -75,30 +87,40 @@ button.btn-light:hover, .btn-outline-success:hover, .btn-outline-danger:hover {
 
 /* Toast customizado */
 .toast-message {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   opacity: 0.95;
   font-size: 1rem;
   pointer-events: none;
 }
-.bg-success { background: #198754 !important; }
-.bg-danger { background: #dc3545 !important; }
+
+.bg-success {
+  background: #198754 !important;
+}
+
+.bg-danger {
+  background: #dc3545 !important;
+}
 
 /* Responsividade extra */
 @media (max-width: 991px) {
   .sidebar {
     display: none;
   }
+
   main.flex-grow-1 {
     margin-left: 0 !important;
   }
 }
+
 @media (max-width: 767px) {
   .card-header h5 {
     font-size: 1rem;
   }
+
   .list-group-item {
     font-size: 0.97rem;
   }
+
   .container.py-5 {
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
