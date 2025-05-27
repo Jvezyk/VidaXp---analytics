@@ -1,29 +1,56 @@
-# Projeto VidaXp Analytics
+# 🌱 VidaXP – Assistente de Organização Acadêmica
 
-## 💡 Problema
-Usuários muitas vezes têm dificuldades em acompanhar e melhorar seus hábitos diários e produtividade. O sistema VidaXp permite registrar e analisar atividades rotineiras com foco em desenvolvimento pessoal e gamificação.
+Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário.
+
+---
 
 ## 🎯 Objetivo
-Fornecer um sistema para cadastrar tarefas, hábitos e metas, permitindo visualização de progresso, produtividade e sugestões de melhoria.
 
-## 🧾 Casos de Uso
+O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
-### Caso de Uso 1 – Cadastro de Tarefa
-**Ator:** Usuário  
-**Descrição:** O usuário insere uma nova tarefa com nome, descrição e prazo.  
-**Fluxo principal:**  
-1. Usuário acessa a tela de nova tarefa  
-2. Preenche os campos  
-3. Confirma cadastro  
-4. Tarefa é salva no banco de dados
+- Organizar tarefas e hábitos acadêmicos
+- Visualizar o status das atividades
+- Marcar itens como concluídos
+- Navegar por uma interface limpa e responsiva (desenvolvida com Flask + Bootstrap)
 
-### Caso de Uso 2 – Marcar Hábito como Concluído
-**Ator:** Usuário  
-**Descrição:** Usuário seleciona um hábito diário e marca como feito.  
-**Fluxo principal:**  
-1. Usuário visualiza a lista de hábitos  
-2. Clica em "Concluir"  
-3. Sistema atualiza o status no banco de dados
+---
 
-...
+## 🧠 Conceitos de Orientação a Objetos aplicados
 
+| Conceito OO       | Aplicação no Projeto                    |
+|-------------------|------------------------------------------|
+| **Abstração**     | Classe abstrata `Atividade`             |
+| **Herança**       | `Tarefa` e `Habito` herdam de `Atividade` |
+| **Composição**    | `Usuario` possui listas de tarefas/hábitos |
+| **Encapsulamento**| Métodos organizados por responsabilidade |
+| **Modularização** | Separação clara entre lógica e interface |
+
+---
+
+## 🧱 Estrutura do Projeto
+
+VidaXp---analytics/
+├── app.py *#Aplicação principal (Flask)*
+├── README.md *#Documentação do projeto*
+├── requirements.txt *#Dependências*
+│
+├── templates/ *# HTML (interface com usuário)*
+│ ├── base.html
+│ └── index.html
+│
+├── static/ *# CSS customizado*
+│ └── style.css
+│
+├── package/ *# Lógica do sistema (orientado a objetos)*
+│ ├── usuario.py
+│ └── atividades/
+│ ├── atividade.py
+│ ├── tarefa.py
+│ └── habito.py
+│
+├── instance/ *# Banco de dados local(SQL)*
+│ └── vidaxp.db
+
+## Para instalar as bibliotecas necessarias 
+*Bash:*
+pip install -r requirements.txt
