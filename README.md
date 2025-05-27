@@ -51,6 +51,8 @@ VidaXp---analytics/
 ├── instance/ # Banco de dados local(SQL)
 │ └── vidaxp.db
 
+---
+
 ## Para instalar as bibliotecas necessarias 
 *Bash:*
 pip install -r requirements.txt
