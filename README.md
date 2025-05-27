@@ -38,7 +38,8 @@ VidaXp---analytics/
 │ ├── base.html
 │ └── index.html
 │
-├── static/ # CSS customizado
+├── static/ # CSS (customizado)/JavaScript(Interações)
+| ├── dashboard.js
 │ └── style.css
 │
 ├── package/ # Lógica do sistema (orientado a objetos)
