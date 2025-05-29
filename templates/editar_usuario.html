@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-warning text-dark rounded-top-4">
+                    <h4 class="mb-0">Editar Usuário</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome do usuário</label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="{{ usuario.nome }}"
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Salvar</button>
+                    </form>
+                    <hr>
+                    <form action="{{ url_for('excluir_usuario', id=usuario.id) }}" method="post"
+                        onsubmit="return confirm('Tem certeza que deseja excluir este usuário? Todas as tarefas e hábitos serão apagados!');">
+                        <button type="submit" class="btn btn-danger w-100 mt-2">Excluir Usuário</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

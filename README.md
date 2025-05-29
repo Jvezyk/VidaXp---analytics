@@ -36,15 +36,17 @@ VidaXp---analytics/
 │
 ├── templates/ # HTML (interface com usuário)
 │ ├── base.html
-│ └── index.html
+│ ├── criar_usuario.html
+│ ├── editar_usuario.html
+│ ├── index.html
+│ └── login.html
 │
 ├── static/ # CSS (customizado)/JavaScript(Interações)
 | ├── dashboard.js
 │ └── style.css
 │
 ├── package/ # Lógica do sistema (orientado a objetos)
-│ ├── usuario.py
-│ └── atividades/
+│ ├── atividades/
 │ ├── atividade.py
 │ ├── tarefa.py
 │ └── habito.py
