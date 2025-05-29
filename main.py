@@ -103,12 +103,13 @@ def editar_usuario(id):
     return render_template("editar_usuario.html", usuario=usuario)
 
 
-@app.route("/excluir_usuario/<int:id>")
+@app.route("/excluir_usuario/<int:id>", methods=["POST"])
 def excluir_usuario(id):
     usuario = Usuario.query.get_or_404(id)
     db.session.delete(usuario)
     db.session.commit()
-    return redirect(url_for("criar_usuario"))
+    session.pop("usuario_id", None)
+    return redirect(url_for("login"))
 
 
 @app.route("/inicio")
@@ -166,8 +167,10 @@ def remover_tarefa(id):
 
 @app.route("/adicionar_habito", methods=["POST"])
 def adicionar_habito():
+    usuario_id = session.get("usuario_id")
+    usuario = Usuario.query.get(usuario_id)
     titulo = request.form["titulo"]
-    habito = Habito(titulo=titulo)
+    habito = Habito(titulo=titulo, usuario=usuario)
     db.session.add(habito)
     db.session.commit()
     return redirect(url_for("habitos"))

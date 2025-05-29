@@ -24,7 +24,7 @@
     <div class="col-lg-6">
       <div class="card shadow border-0 rounded-4">
         <div class="card-body">
-          <h2 class="card-title mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Bem-vindo ao VidaXP!</h2>
+          <h2 class="card-title mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Bem-vindo ao Vida Analytics!</h2>
           <p class="card-text">Gerencie suas tarefas e hábitos, acompanhe seu progresso e evolua sua rotina!</p>
           <hr>
           <div class="d-flex gap-4">
@@ -59,12 +59,12 @@
         <button class="btn btn-light btn-sm" title="Adicionar tarefa"><i class="bi bi-plus-lg"></i></button>
       </form>
     </div>
-    
+
     <!-- Lista de tarefas pendentes -->
     <ul class="list-group list-group-flush">
       {% set tem_pendente = false %}
       {% for t in tarefas %}
-      {% if t.status == 'pendente' %}
+      {% if t.status != 'concluída' %}
       {% set tem_pendente = true %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
         <span>
@@ -89,7 +89,6 @@
     <div class="px-3 pt-3">
       <h6 class="text-muted mb-2"><i class="bi bi-check2-all"></i> Concluídas</h6>
       <ul class="list-group list-group-flush">
-        {% set tem_concluida = false %}
         {% for t in tarefas %}
         {% if t.status == 'concluída' %}
         {% set tem_concluida = true %}

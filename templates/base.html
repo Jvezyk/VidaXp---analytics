@@ -49,7 +49,7 @@
   </script>
   <style>
     body {
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     }
   </style>
 </head>
@@ -57,12 +57,15 @@
 <body>
   <div class="d-flex min-vh-100">
 
-    
+
     <!-- Sidebar -->
     <nav class="sidebar bg-dark text-white p-4 d-flex flex-column justify-content-between">
       <div>
         <h2 class="mb-4" style="font-weight: bold; letter-spacing: 2px;">
-          <i class="bi bi-bar-chart-steps me-2"></i>VidaXP
+          <i class="bi bi-bar-chart-steps me-2"></i>Vida
+          <br>
+          <span style="font: weight semibold; letter-spacing: 3px;">Analytics
+          </span>
         </h2>
         <ul class="nav flex-column gap-2">
           <li class="nav-item">
@@ -82,6 +85,10 @@
             </a>
           </li>
         </ul>
+      </div>
+      <div class="mt-auto p-2 ">
+        <a href="{{ url_for('editar_usuario', id=session['usuario_id']) }}" class="btn btn-outline-light w-100 mt-4">⚙️
+          Perfil</a>
       </div>
       <!-- ... resto da sidebar ... -->
     </nav>
