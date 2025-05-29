@@ -21,7 +21,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 |-------------------|------------------------------------------|
 | **Abstração**     | Classe abstrata `Atividade`             |
 | **Herança**       | `Tarefa` e `Habito` herdam de `Atividade` |
-| **Composição**    | `Usuario` possui listas de tarefas/hábitos |
+| **Composição**    | `Usuario` possui nome e senha para acessar |
 | **Encapsulamento**| Métodos organizados por responsabilidade |
 | **Modularização** | Separação clara entre lógica e interface |
 
