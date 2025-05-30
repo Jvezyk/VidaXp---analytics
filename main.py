@@ -55,6 +55,18 @@ class RegistroHabito(db.Model):
     habito_id = db.Column(db.Integer, db.ForeignKey(
         'habito.id'), nullable=False)
 
+
+def renovar_registros_habitos(usuario_id):
+    hoje = date.today()
+    habitos = Habito.query.filter_by(usuario_id=usuario_id).all()
+    for habito in habitos:
+        existe = RegistroHabito.query.filter_by(
+            habito_id=habito.id, data=hoje).first()
+        if not existe:
+            novo = RegistroHabito(habito_id=habito.id)
+            db.session.add(novo)
+    db.session.commit()
+
 # Rotas
 
 
@@ -219,6 +231,7 @@ def remover_habito(id):
 def dados_grafico():
     usuario_id = session.get("usuario_id")
     hoje = date.today()
+    renovar_registros_habitos(usuario_id)
 
     tarefas_concluidas = Tarefa.query.filter_by(
         usuario_id=usuario_id, status='concluída').count()
@@ -244,7 +257,6 @@ def dados_grafico():
 @app.route("/dados_grafico_progresso")
 def dados_grafico_progresso():
     usuario_id = session.get("usuario_id")
-    # Descobre o menor e maior dia de conclusão
     primeira_tarefa = Tarefa.query.filter_by(
         usuario_id=usuario_id).order_by(Tarefa.data_entrega).first()
     hoje = date.today()
@@ -258,24 +270,40 @@ def dados_grafico_progresso():
 
     dias = []
     tarefas = []
-    habitos = []
+    habitos_concluidos = []
+    habitos_pendentes = []
 
     for n in range((fim_dt - inicio_dt).days + 1):
         dia = inicio_dt + timedelta(days=n)
         dias.append(dia.strftime("%Y-%m-%d"))
+
+        # Tarefas concluídas no dia
         tarefas_concluidas = Tarefa.query.filter_by(
             usuario_id=usuario_id, status='concluída'
         ).filter(db.func.date(Tarefa.data_entrega) == dia).count()
         tarefas.append(tarefas_concluidas)
 
-        registros = RegistroHabito.query.join(Habito).filter(
+        # Hábitos concluídos e pendentes no dia
+        registros_total = RegistroHabito.query.join(Habito).filter(
+            Habito.usuario_id == usuario_id,
+            RegistroHabito.data == dia
+        ).count()
+
+        registros_concluidos = RegistroHabito.query.join(Habito).filter(
             Habito.usuario_id == usuario_id,
             RegistroHabito.data == dia,
             RegistroHabito.concluido == True
         ).count()
-        habitos.append(registros)
 
-    return jsonify({"dias": dias, "tarefas": tarefas, "habitos": habitos})
+        habitos_concluidos.append(registros_concluidos)
+        habitos_pendentes.append(registros_total - registros_concluidos)
+
+    return jsonify({
+        "dias": dias,
+        "tarefas": tarefas,
+        "habitos_concluidos": habitos_concluidos,
+        "habitos_pendentes": habitos_pendentes
+    })
 
 
 with app.app_context():

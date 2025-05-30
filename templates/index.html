@@ -73,9 +73,16 @@
               },
               {
                 label: 'Hábitos concluídos',
-                data: dados.habitos,
+                data: dados.habitos_concluidos,
                 borderColor: 'rgba(40, 167, 69, 1)',
                 backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                tension: 0.3
+              },
+              {
+                label: 'Hábitos pendentes',
+                data: dados.habitos_pendentes,
+                borderColor: 'rgba(255, 193, 7, 1)',
+                backgroundColor: 'rgba(255, 193, 7, 0.2)',
                 tension: 0.3
               }
             ]
@@ -89,6 +96,7 @@
           }
         });
       }
+      document.addEventListener('DOMContentLoaded', atualizarGrafico);
     </script>
     {% elif aba == 'tarefas' %}
     <div class="card shadow border-0 rounded-4">
