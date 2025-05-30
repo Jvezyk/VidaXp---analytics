@@ -48,18 +48,7 @@
           data.habitos_total
         ));
     }
-    //document.addEventListener('DOMContentLoaded', atualizarGraficoProdutividade);
 
-    function atualizarGraficoProgresso() {
-      fetch('/dados_grafico')
-        .then(res => res.json())
-        .then(data => renderGraficoProgresso(
-          data.tarefas_concluidas,
-          data.tarefas_pendentes,
-          data.habitos_concluidos,
-          data.habitos_total
-        ));
-    }
     document.addEventListener('DOMContentLoaded', atualizarGraficoProgresso);
   </script>
   <style>
