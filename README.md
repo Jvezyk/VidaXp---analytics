@@ -1,4 +1,4 @@
-# 🌱 VidaXP – Assistente de Organização Acadêmica
+# 🌱 Vida Analystics – Assistente de Organização Acadêmica
 
 Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário. O Projeto se encontra na forma simples, tendo poucas funcionalidades mas com grande chances de ser melhorado no futuro.
 
