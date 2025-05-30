@@ -64,7 +64,8 @@ def renovar_registros_habitos(usuario_id):
         existe = RegistroHabito.query.filter_by(
             habito_id=habito.id, data=hoje).first()
         if not existe:
-            novo = RegistroHabito(habito_id=habito.id, data=hoje)
+            novo = RegistroHabito()
+            novo.habito_id = habito.id
             db.session.add(novo)
     db.session.commit()
 
@@ -98,7 +99,9 @@ def criar_usuario():
         nome = request.form["nome"]
         senha = request.form["senha"]
         if not Usuario.query.filter_by(nome=nome).first():
-            usuario = Usuario(nome=nome, senha=senha)
+            usuario = Usuario()
+            usuario.nome = nome
+            usuario.senha = senha
             db.session.add(usuario)
             db.session.commit()
             session["usuario_id"] = usuario.id
@@ -145,8 +148,8 @@ def dashboard():
         return redirect(url_for("login"))
     renovar_registros_habitos(usuario_id)
     usuario = Usuario.query.get(usuario_id)
-    tarefas = usuario.tarefas
-    habitos = usuario.habitos
+    tarefas = usuario.tarefas if usuario else []
+    habitos = usuario.habitos if usuario else []
     return render_template("index.html", tarefas=tarefas, habitos=habitos, aba="dashboard")
 
 
@@ -169,7 +172,9 @@ def adicionar_tarefa():
     usuario_id = session.get("usuario_id")
     usuario = Usuario.query.get(usuario_id)
     titulo = request.form["titulo"]
-    tarefa = Tarefa(titulo=titulo, usuario=usuario)
+    tarefa = Tarefa()
+    tarefa.titulo = titulo
+    tarefa.usuario_id = usuario_id
     db.session.add(tarefa)
     db.session.commit()
     return redirect(url_for("tarefas"))
@@ -196,7 +201,9 @@ def adicionar_habito():
     usuario_id = session.get("usuario_id")
     usuario = Usuario.query.get(usuario_id)
     titulo = request.form["titulo"]
-    habito = Habito(titulo=titulo, usuario=usuario)
+    habito = Habito()
+    habito.titulo = titulo
+    habito.usuario_id = usuario_id
     db.session.add(habito)
     db.session.commit()
     return redirect(url_for("habitos"))
