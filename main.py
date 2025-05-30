@@ -55,22 +55,8 @@ class RegistroHabito(db.Model):
     habito_id = db.Column(db.Integer, db.ForeignKey(
         'habito.id'), nullable=False)
 
-
-# Função que renova hábitos diariamente
-def renovar_registros_habitos(usuario_id):
-    hoje = date.today()
-    habitos = Habito.query.filter_by(usuario_id=usuario_id).all()
-    for habito in habitos:
-        existe = RegistroHabito.query.filter_by(
-            habito_id=habito.id, data=hoje).first()
-        if not existe:
-            novo = RegistroHabito()
-            novo.habito_id = habito.id
-            db.session.add(novo)
-    db.session.commit()
-
-
 # Rotas
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -146,7 +132,6 @@ def dashboard():
     usuario_id = session.get("usuario_id")
     if not usuario_id:
         return redirect(url_for("login"))
-    renovar_registros_habitos(usuario_id)
     usuario = Usuario.query.get(usuario_id)
     tarefas = usuario.tarefas if usuario else []
     habitos = usuario.habitos if usuario else []
