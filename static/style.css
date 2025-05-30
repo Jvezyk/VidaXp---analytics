@@ -1,7 +1,7 @@
 /* Fundo suave */
 body {
   background: linear-gradient(120deg, #f8fafc 0%, #e0eafc 100%);
-  min-height: 100vh;
+  min-height: 10vh;
 }
 
 /* Sidebar */

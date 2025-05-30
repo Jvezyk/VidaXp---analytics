@@ -1,81 +1,106 @@
-// Função para enviar formulários sem recarregar a página
-// Toast simples
+// Toast simples com fade e timeout
 function showToast(msg, type = "success") {
-    let toast = document.createElement('div');
-    toast.className = `toast-message bg-${type} text-white px-3 py-2 rounded position-fixed`;
-    toast.style.top = "20px";
-    toast.style.right = "20px";
-    toast.style.zIndex = 9999;
-    toast.innerText = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
+  let toast = document.createElement('div');
+  toast.className = `toast-message bg-${type} text-white px-3 py-2 rounded position-fixed`;
+  toast.style.top = "20px";
+  toast.style.right = "20px";
+  toast.style.zIndex = 9999;
+  toast.style.opacity = 1;
+  toast.innerText = msg;
+  document.body.appendChild(toast);
+
+  // Fade-out antes de remover
+  setTimeout(() => {
+    toast.style.transition = "opacity 0.5s ease";
+    toast.style.opacity = 0;
+    setTimeout(() => toast.remove(), 500);
+  }, 1800);
 }
 
-// Adiciona tarefa/hábito sem reload
-function ajaxForm(formSelector, listSelector, urlRedirect) {
-    const form = document.querySelector(formSelector);
-    if (!form) return;
+// Envio de formulários via AJAX
+function ajaxForm(formSelector, urlRedirect) {
+  const form = document.querySelector(formSelector);
+  if (!form) {
+    console.warn("Formulário não encontrado:", formSelector);
+    return;
+  }
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const formData = new FormData(form);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.text())
-            .then(() => {
-                showToast("Adicionado com sucesso!");
-                atualizarGraficoProgresso(); // Atualiza o gráfico
-                setTimeout(() => window.location.href = urlRedirect, 800);
-            });
-    });
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.text())
+      .then(() => {
+        showToast("Adicionado com sucesso!");
+        atualizarGraficoProgresso();
+        setTimeout(() => window.location.href = urlRedirect, 800);
+      })
+      .catch(err => {
+        console.error("Erro ao enviar formulário:", err);
+        showToast("Erro ao adicionar", "danger");
+      });
+  });
 }
 
-
-// Concluir/remover sem reload e com animação
+// Ação AJAX para concluir/remover com animação
 function ajaxAction(linkSelector, urlRedirect, actionMsg) {
-    document.querySelectorAll(linkSelector).forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const li = link.closest('li');
-            fetch(link.href)
-                .then(response => response.text())
-                .then(() => {
-                    if (li) {
-                        li.style.transition = "opacity 0.5s";
-                        li.style.opacity = 0.3;
-                        setTimeout(() => {
-                            li.remove();
-                            showToast(actionMsg);
-                            atualizarGraficoProgresso(); // Atualiza o gráfico
-                            setTimeout(() => window.location.href = urlRedirect, 500);
-                        }, 400);
-                    } else {
-                        showToast(actionMsg);
-                        atualizarGraficoProgresso(); // Atualiza o gráfico
-                        setTimeout(() => window.location.href = urlRedirect, 500);
-                    }
-                });
+  const links = document.querySelectorAll(linkSelector);
+  if (!links.length) {
+    console.warn("Nenhum link encontrado para:", linkSelector);
+    return;
+  }
+
+  links.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const li = link.closest('li');
+
+      fetch(link.href)
+        .then(response => response.text())
+        .then(() => {
+          if (li) {
+            li.style.transition = "opacity 0.5s ease";
+            li.style.opacity = 0.3;
+            setTimeout(() => {
+              li.remove();
+              showToast(actionMsg);
+              atualizarGraficoProgresso();
+              setTimeout(() => window.location.href = urlRedirect, 500);
+            }, 400);
+          } else {
+            showToast(actionMsg);
+            atualizarGraficoProgresso();
+            setTimeout(() => window.location.href = urlRedirect, 500);
+          }
+        })
+        .catch(err => {
+          console.error("Erro ao executar ação AJAX:", err);
+          showToast("Erro na ação", "danger");
         });
     });
+  });
 }
 
-// Inicialização ao carregar a página
+// Executa ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
-    // Tarefas
-    ajaxForm('form[action*="adicionar_tarefa"]', '.list-group', '/tarefas');
-    ajaxAction('a[href*="concluir_tarefa"]', '/tarefas', "Tarefa concluída!");
-    ajaxAction('a[href*="remover_tarefa"]', '/tarefas', "Tarefa removida!");
+  console.log("JS VidaXP carregado!");
 
-    // Hábitos
-    ajaxForm('form[action*="adicionar_habito"]', '.list-group', '/habitos');
-    ajaxAction('a[href*="concluir_habito"]', '/habitos', "Hábito concluído!");
-    ajaxAction('a[href*="remover_habito"]', '/habitos', "Hábito removido!");
+  // Tarefas
+  ajaxForm('form[action*="adicionar_tarefa"]', '/tarefas');
+  ajaxAction('a[href*="concluir_tarefa"]', '/tarefas', "Tarefa concluída!");
+  ajaxAction('a[href*="remover_tarefa"]', '/tarefas', "Tarefa removida!");
+
+  // Hábitos
+  ajaxForm('form[action*="adicionar_habito"]', '/habitos');
+  ajaxAction('a[href*="concluir_habito"]', '/habitos', "Hábito concluído!");
+  ajaxAction('a[href*="remover_habito"]', '/habitos', "Hábito removido!");
 });
 
-// Toast CSS (adicione no seu style.css se quiser)
+// Toast estilo CSS injetado
 const style = document.createElement('style');
 style.innerHTML = `
 .toast-message {
@@ -83,10 +108,9 @@ style.innerHTML = `
   opacity: 0.95;
   font-size: 1rem;
   pointer-events: none;
+  transition: opacity 0.5s ease;
 }
 .bg-success { background: #198754 !important; }
 .bg-danger { background: #dc3545 !important; }
 `;
 document.head.appendChild(style);
-
-console.log("JS carregado!");

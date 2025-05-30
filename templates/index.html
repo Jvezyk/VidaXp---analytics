@@ -40,106 +40,145 @@
         </div>
       </div>
     </div>
+
     <!-- Gráfico de progresso -->
-    <div class="col-lg-6">
+    <!-- Gráfico de Progresso Diário -->
+    <div class="container py-5">
       <div class="card shadow border-0 rounded-4">
+        <div class="card-header bg-info text-white rounded-top-4">
+          <h5 class="mb-0"><i class="bi bi-graph-up"></i> Progresso Diário</h5>
+        </div>
         <div class="card-body">
-          <h5 class="card-title"><i class="bi bi-graph-up-arrow me-2"></i>Seu Progresso</h5>
-          <canvas id="graficoProgresso" height="80"></canvas>
+          <canvas id="graficoProgresso" height="100"></canvas>
         </div>
       </div>
     </div>
-  </div>
-  {% elif aba == 'tarefas' %}
-  <div class="card shadow border-0 rounded-4">
-    <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Tarefas</h5>
-      <form action="{{ url_for('adicionar_tarefa') }}" method="POST" class="d-flex gap-2 mb-0">
-        <input name="titulo" class="form-control form-control-sm" placeholder="Nova tarefa" required>
-        <button class="btn btn-light btn-sm" title="Adicionar tarefa"><i class="bi bi-plus-lg"></i></button>
-      </form>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      async function atualizarGrafico() {
+        const resp = await fetch('/dados_grafico_progresso');
+        const dados = await resp.json();
+        const ctx = document.getElementById('graficoProgresso').getContext('2d');
+        if (window.graficoProgresso) window.graficoProgresso.destroy();
+        window.graficoProgresso = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dados.dias,
+            datasets: [
+              {
+                label: 'Tarefas concluídas',
+                data: dados.tarefas,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                tension: 0.3
+              },
+              {
+                label: 'Hábitos concluídos',
+                data: dados.habitos,
+                borderColor: 'rgba(40, 167, 69, 1)',
+                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: { display: false }
+            }
+          }
+        });
+      }
+      // document.addEventListener('DOMContentLoaded', atualizarGrafico);
+    </script>
+    {% elif aba == 'tarefas' %}
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Tarefas</h5>
+        <form action="{{ url_for('adicionar_tarefa') }}" method="POST" class="d-flex gap-2 mb-0">
+          <input name="titulo" class="form-control form-control-sm" placeholder="Nova tarefa" required>
+          <button class="btn btn-light btn-sm" title="Adicionar tarefa"><i class="bi bi-plus-lg"></i></button>
+        </form>
+      </div>
 
-    <!-- Lista de tarefas pendentes -->
-    <ul class="list-group list-group-flush">
-      {% set tem_pendente = false %}
-      {% for t in tarefas %}
-      {% if t.status != 'concluída' %}
-      {% set tem_pendente = true %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>
-          <i class="bi bi-check2-circle me-1 text-secondary"></i>
-          {{ t.titulo }}
-        </span>
-        <div>
-          <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm" title="Concluir"><i
-              class="bi bi-check-lg"></i></a>
-          <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-            title="Remover"><i class="bi bi-trash"></i></a>
-        </div>
-      </li>
-      {% endif %}
-      {% endfor %}
-      {% if not tem_pendente %}
-      <li class="list-group-item text-muted text-center">Nenhuma tarefa pendente.</li>
-      {% endif %}
-    </ul>
-
-    <!-- Seção de tarefas concluídas -->
-    <div class="px-3 pt-3">
-      <h6 class="text-muted mb-2"><i class="bi bi-check2-all"></i> Concluídas</h6>
+      <!-- Lista de tarefas pendentes -->
       <ul class="list-group list-group-flush">
-        {% for t in tarefas %}
-        {% if t.status == 'concluída' %}
-        {% set tem_concluida = true %}
-        <li
-          class="list-group-item d-flex justify-content-between align-items-center text-success text-decoration-line-through">
+        {% set pendentes = tarefas | selectattr('status', 'equalto', 'pendente') | list %}
+        {% if pendentes %}
+        {% for t in pendentes %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
           <span>
             <i class="bi bi-check2-circle me-1 text-success"></i>
             {{ t.titulo }}
           </span>
-          <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-            title="Remover"><i class="bi bi-trash"></i></a>
+          <div>
+            <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm"
+              title="Concluir"><i class="bi bi-check2"></i></a>
+            <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+              title="Remover"><i class="bi bi-trash"></i></a>
+          </div>
         </li>
-        {% endif %}
         {% endfor %}
-        {% if not tem_concluida %}
-        <li class="list-group-item text-muted text-center">Nenhuma tarefa concluída.</li>
+        {% else %}
+        <li class="list-group-item text-muted text-center">Nenhuma tarefa pendente.</li>
         {% endif %}
       </ul>
-    </div>
-  </div>
-  {% elif aba == 'habitos' %}
-  <div class="card shadow border-0 rounded-4">
-    <div class="card-header bg-success text-white rounded-top-4 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0"><i class="bi bi-repeat me-2"></i>Hábitos</h5>
-      <form action="{{ url_for('adicionar_habito') }}" method="POST" class="d-flex gap-2 mb-0">
-        <input name="titulo" class="form-control form-control-sm" placeholder="Novo hábito" required>
-        <button class="btn btn-light btn-sm" title="Adicionar hábito"><i class="bi bi-plus-lg"></i></button>
-      </form>
-    </div>
-    <ul class="list-group list-group-flush">
-      {% for h in habitos %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="{% if h.status=='concluído' %}text-decoration-line-through text-success fw-semibold{% endif %}">
-          <i
-            class="bi bi-check2-circle me-1 {% if h.status=='concluído' %}text-success{% else %}text-secondary{% endif %}"></i>
-          {{ h.titulo }}
-        </span>
-        <div>
-          {% if h.status == 'pendente' %}
-          <a href="{{ url_for('concluir_habito', id=h.id) }}" class="btn btn-outline-success btn-sm" title="Concluir"><i
-              class="bi bi-check-lg"></i></a>
+
+      <!-- Seção de tarefas concluídas -->
+      <div class="px-3 pt-3">
+        <h6 class="text-muted mb-2"><i class="bi bi-check2-all"></i> Concluídas</h6>
+        <ul class="list-group list-group-flush">
+          {% set concluidas = tarefas | selectattr('status', 'equalto', 'concluída') | list %}
+          {% if concluidas %}
+          {% for t in concluidas %}
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center text-success text-decoration-line-through">
+            <span>
+              <i class="bi bi-check2-circle me-1 text-success"></i>
+              {{ t.titulo }}
+            </span>
+            <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+              title="Remover"><i class="bi bi-trash"></i></a>
+          </li>
+          {% endfor %}
+          {% else %}
+          <li class="list-group-item text-muted text-center">Nenhuma tarefa concluída.</li>
           {% endif %}
-          <a href="{{ url_for('remover_habito', id=h.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-            title="Remover"><i class="bi bi-trash"></i></a>
-        </div>
-      </li>
-      {% else %}
-      <li class="list-group-item text-muted text-center">Nenhum hábito adicionado.</li>
-      {% endfor %}
-    </ul>
+        </ul>
+      </div>
+    </div>
+    {% elif aba == 'habitos' %}
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-header bg-success text-white rounded-top-4 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-repeat me-2"></i>Hábitos</h5>
+        <form action="{{ url_for('adicionar_habito') }}" method="POST" class="d-flex gap-2 mb-0">
+          <input name="titulo" class="form-control form-control-sm" placeholder="Novo hábito" required>
+          <button class="btn btn-light btn-sm" title="Adicionar hábito"><i class="bi bi-plus-lg"></i></button>
+        </form>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for h in habitos %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="{% if h.status=='concluído' %}text-decoration-line-through text-success fw-semibold{% endif %}">
+            <i
+              class="bi bi-check2-circle me-1 {% if h.status=='concluído' %}text-success{% else %}text-secondary{% endif %}"></i>
+            {{ h.titulo }}
+          </span>
+          <div>
+            {% if h.status == 'pendente' %}
+            <a href="{{ url_for('concluir_habito', id=h.id) }}" class="btn btn-outline-success btn-sm"
+              title="Concluir"><i class="bi bi-check-lg"></i></a>
+            {% endif %}
+            <a href="{{ url_for('remover_habito', id=h.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+              title="Remover"><i class="bi bi-trash"></i></a>
+          </div>
+        </li>
+        {% else %}
+        <li class="list-group-item text-muted text-center">Nenhum hábito adicionado.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
-</div>
-{% endblock %}
+  {% endblock %}

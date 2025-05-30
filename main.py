@@ -1,12 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
-from flask import session, redirect, url_for, render_template
+from datetime import datetime, date, timedelta
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vidaxp.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = "um_valor_bem_secreto_e_unico" 
+app.secret_key = "um_valor_bem_secreto_e_unico"
 db = SQLAlchemy(app)
 
 # Modelos do banco
@@ -41,12 +41,35 @@ class Habito(db.Model):
     frequencia = db.Column(db.String(20), default='diário')
     usuario_id = db.Column(db.Integer, db.ForeignKey(
         'usuario.id'), nullable=False)
+    registros = db.relationship(
+        'RegistroHabito', backref='habito', cascade="all, delete-orphan")
 
     def concluir(self):
         self.status = 'concluído'
 
-# Rotas
 
+class RegistroHabito(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.Date, default=date.today)
+    concluido = db.Column(db.Boolean, default=False)
+    habito_id = db.Column(db.Integer, db.ForeignKey(
+        'habito.id'), nullable=False)
+
+
+# Função que renova hábitos diariamente
+def renovar_registros_habitos(usuario_id):
+    hoje = date.today()
+    habitos = Habito.query.filter_by(usuario_id=usuario_id).all()
+    for habito in habitos:
+        existe = RegistroHabito.query.filter_by(
+            habito_id=habito.id, data=hoje).first()
+        if not existe:
+            novo = RegistroHabito(habito_id=habito.id, data=hoje)
+            db.session.add(novo)
+    db.session.commit()
+
+
+# Rotas
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -69,13 +92,6 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/")
-def inicio():
-    if not Usuario.query.first():
-        return redirect(url_for("criar_usuario"))
-    return redirect(url_for("login"))
-
-
 @app.route("/criar_usuario", methods=["GET", "POST"])
 def criar_usuario():
     if request.method == "POST":
@@ -85,7 +101,7 @@ def criar_usuario():
             usuario = Usuario(nome=nome, senha=senha)
             db.session.add(usuario)
             db.session.commit()
-            session["usuario_id"] = usuario.id  # já faz login automático
+            session["usuario_id"] = usuario.id
             return redirect(url_for("dashboard"))
         else:
             erro = "Usuário já existe!"
@@ -98,6 +114,9 @@ def editar_usuario(id):
     usuario = Usuario.query.get_or_404(id)
     if request.method == "POST":
         usuario.nome = request.form["nome"]
+        nova_senha = request.form.get("senha")
+        if nova_senha:
+            usuario.senha = nova_senha
         db.session.commit()
         return redirect(url_for("dashboard"))
     return render_template("editar_usuario.html", usuario=usuario)
@@ -112,14 +131,20 @@ def excluir_usuario(id):
     return redirect(url_for("login"))
 
 
-@app.route("/inicio")
+@app.route("/")
+def inicio():
+    if not Usuario.query.first():
+        return redirect(url_for("criar_usuario"))
+    return redirect(url_for("login"))
+
+
+@app.route("/dashboard")
 def dashboard():
     usuario_id = session.get("usuario_id")
     if not usuario_id:
         return redirect(url_for("login"))
+    renovar_registros_habitos(usuario_id)
     usuario = Usuario.query.get(usuario_id)
-    if not usuario:
-        return redirect(url_for("criar_usuario"))
     tarefas = usuario.tarefas
     habitos = usuario.habitos
     return render_template("index.html", tarefas=tarefas, habitos=habitos, aba="dashboard")
@@ -127,13 +152,15 @@ def dashboard():
 
 @app.route("/tarefas")
 def tarefas():
-    tarefas = Tarefa.query.all()
+    usuario_id = session.get("usuario_id")
+    tarefas = Tarefa.query.filter_by(usuario_id=usuario_id).all()
     return render_template("index.html", tarefas=tarefas, aba="tarefas")
 
 
 @app.route("/habitos")
 def habitos():
-    habitos = Habito.query.all()
+    usuario_id = session.get("usuario_id")
+    habitos = Habito.query.filter_by(usuario_id=usuario_id).all()
     return render_template("index.html", habitos=habitos, aba="habitos")
 
 
@@ -141,7 +168,6 @@ def habitos():
 def adicionar_tarefa():
     usuario_id = session.get("usuario_id")
     usuario = Usuario.query.get(usuario_id)
-    usuario = Usuario.query.first()
     titulo = request.form["titulo"]
     tarefa = Tarefa(titulo=titulo, usuario=usuario)
     db.session.add(tarefa)
@@ -179,6 +205,11 @@ def adicionar_habito():
 @app.route("/concluir_habito/<int:id>")
 def concluir_habito(id):
     habito = Habito.query.get_or_404(id)
+    hoje = date.today()
+    registro = RegistroHabito.query.filter_by(
+        habito_id=habito.id, data=hoje).first()
+    if registro:
+        registro.concluido = True
     habito.concluir()
     db.session.commit()
     return redirect(url_for("habitos"))
@@ -194,12 +225,67 @@ def remover_habito(id):
 
 @app.route("/dados_grafico")
 def dados_grafico():
-    tarefas_concluidas = Tarefa.query.filter_by(status='concluída').count()
-    habitos_concluidos = Habito.query.filter_by(status='concluído').count()
-    return jsonify({"tarefas": tarefas_concluidas, "habitos": habitos_concluidos})
+    usuario_id = session.get("usuario_id")
+    hoje = date.today()
+
+    tarefas_concluidas = Tarefa.query.filter_by(
+        usuario_id=usuario_id, status='concluída').count()
+    tarefas_pendentes = Tarefa.query.filter_by(
+        usuario_id=usuario_id, status='pendente').count()
+
+    registros = RegistroHabito.query.join(Habito).filter(
+        Habito.usuario_id == usuario_id,
+        RegistroHabito.data == hoje
+    ).all()
+
+    habitos_concluidos = sum(1 for r in registros if r.concluido)
+    habitos_total = len(registros)
+
+    return jsonify({
+        "tarefas_concluidas": tarefas_concluidas,
+        "tarefas_pendentes": tarefas_pendentes,
+        "habitos_concluidos": habitos_concluidos,
+        "habitos_total": habitos_total
+    })
 
 
-# Crie o banco de dados na primeira execução
+@app.route("/dados_grafico_progresso")
+def dados_grafico_progresso():
+    usuario_id = session.get("usuario_id")
+    # Descobre o menor e maior dia de conclusão
+    primeira_tarefa = Tarefa.query.filter_by(
+        usuario_id=usuario_id).order_by(Tarefa.data_entrega).first()
+    hoje = date.today()
+    if primeira_tarefa and primeira_tarefa.data_entrega:
+        inicio_dt = primeira_tarefa.data_entrega
+        if isinstance(inicio_dt, datetime):
+            inicio_dt = inicio_dt.date()
+    else:
+        inicio_dt = hoje
+    fim_dt = hoje
+
+    dias = []
+    tarefas = []
+    habitos = []
+
+    for n in range((fim_dt - inicio_dt).days + 1):
+        dia = inicio_dt + timedelta(days=n)
+        dias.append(dia.strftime("%Y-%m-%d"))
+        tarefas_concluidas = Tarefa.query.filter_by(
+            usuario_id=usuario_id, status='concluída'
+        ).filter(db.func.date(Tarefa.data_entrega) == dia).count()
+        tarefas.append(tarefas_concluidas)
+
+        registros = RegistroHabito.query.join(Habito).filter(
+            Habito.usuario_id == usuario_id,
+            RegistroHabito.data == dia,
+            RegistroHabito.concluido == True
+        ).count()
+        habitos.append(registros)
+
+    return jsonify({"dias": dias, "tarefas": tarefas, "habitos": habitos})
+
+
 with app.app_context():
     db.create_all()
 

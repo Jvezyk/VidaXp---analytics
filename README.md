@@ -1,6 +1,6 @@
 # 🌱 VidaXP – Assistente de Organização Acadêmica
 
-Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário.
+Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário. O Projeto se encontra na forma simples, tendo poucas funcionalidades mas com grande chances de ser melhorado no futuro.
 
 ---
 
@@ -10,6 +10,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 
 - Organizar tarefas e hábitos acadêmicos
 - Visualizar o status das atividades
+- Ver o seu desempenho diário por meio de um gráfico
 - Marcar itens como concluídos
 - Navegar por uma interface limpa e responsiva (desenvolvida com Flask + Bootstrap)
 
