@@ -57,6 +57,44 @@ class HistoricoAtividade(db.Model):
     titulo = db.Column(db.String(120))
 
 
+class HistoricoPendencias(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    data = db.Column(db.Date)
+    tarefas_pendentes = db.Column(db.Integer)
+    habitos_pendentes = db.Column(db.Integer)
+    habitos_concluidos = db.Column(db.Integer)
+
+
+def registrar_snapshot_pendencias(usuario_id, dia):
+    tarefas_pendentes = Tarefa.query.filter(
+        Tarefa.usuario_id == usuario_id,
+        Tarefa.status == 'pendente',
+        Tarefa.prazo.isnot(None),
+        Tarefa.prazo <= dia
+    ).count()
+    registros_total = RegistroHabito.query.join(Habito).filter(
+        Habito.usuario_id == usuario_id,
+        RegistroHabito.data == dia
+    ).count()
+    registros_concluidos = RegistroHabito.query.join(Habito).filter(
+        Habito.usuario_id == usuario_id,
+        RegistroHabito.data == dia,
+        RegistroHabito.concluido == True
+    ).count()
+    habitos_pendentes = registros_total - registros_concluidos
+
+    snap = HistoricoPendencias(
+        usuario_id=usuario_id,
+        data=dia,
+        tarefas_pendentes=tarefas_pendentes,
+        habitos_pendentes=habitos_pendentes,
+        habitos_concluidos=registros_concluidos
+    )
+    db.session.add(snap)
+    db.session.commit()
+
+
 class RegistroHabito(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.Date, default=date.today)
@@ -77,6 +115,13 @@ def renovar_registros_habitos(usuario_id):
             db.session.add(novo)
     db.session.commit()
 
+
+def registrar_snapshots_ultima_semana(usuario_id):
+    hoje = date.today()
+    for n in range(6, -1, -1):
+        dia = hoje - timedelta(days=n)
+        if not HistoricoPendencias.query.filter_by(usuario_id=usuario_id, data=dia).first():
+            registrar_snapshot_pendencias(usuario_id, dia)
 # Rotas
 
 
@@ -154,9 +199,12 @@ def dashboard():
     usuario_id = session.get("usuario_id")
     if not usuario_id:
         return redirect(url_for("login"))
+    renovar_registros_habitos(usuario_id)
     usuario = Usuario.query.get(usuario_id)
     tarefas = usuario.tarefas if usuario else []
     habitos = usuario.habitos if usuario else []
+    if not HistoricoPendencias.query.filter_by(usuario_id=usuario_id, data=date.today()).first():
+        registrar_snapshot_pendencias(usuario_id, date.today())
     return render_template("index.html", usuario=usuario, tarefas=tarefas, habitos=habitos, aba="dashboard")
 
 
@@ -164,7 +212,6 @@ def dashboard():
 def tarefas():
     usuario_id = session.get("usuario_id")
     tarefas = Tarefa.query.filter_by(usuario_id=usuario_id).all()
-    removido = db.Column(db.Boolean, default=False)
     return render_template("index.html", tarefas=tarefas, aba="tarefas")
 
 
@@ -172,7 +219,6 @@ def tarefas():
 def habitos():
     usuario_id = session.get("usuario_id")
     habitos = Habito.query.filter_by(usuario_id=usuario_id).all()
-    removido = db.Column(db.Boolean, default=False)
     return render_template("index.html", habitos=habitos, aba="habitos")
 
 
@@ -248,6 +294,12 @@ def concluir_habito(id):
     historico.titulo = habito.titulo
     db.session.add(historico)
     db.session.commit()
+    snap = HistoricoPendencias.query.filter_by(
+        usuario_id=habito.usuario_id, data=hoje).first()
+    if snap:
+        db.session.delete(snap)
+        db.session.commit()
+    registrar_snapshot_pendencias(habito.usuario_id, hoje)
     return redirect(url_for("habitos"))
 
 
@@ -316,62 +368,42 @@ def dados_grafico():
 @app.route("/dados_grafico_progresso")
 def dados_grafico_progresso():
     usuario_id = session.get("usuario_id")
-    renovar_registros_habitos(usuario_id)
-    primeira_tarefa = Tarefa.query.filter_by(
-        usuario_id=usuario_id).order_by(Tarefa.data_entrega).first()
     hoje = date.today()
-    if primeira_tarefa and primeira_tarefa.data_entrega:
-        inicio_dt = primeira_tarefa.data_entrega
-        if isinstance(inicio_dt, datetime):
-            inicio_dt = inicio_dt.date()
-    else:
-        inicio_dt = hoje
-    fim_dt = hoje
-
-    dias = []
+    dias = [(hoje - timedelta(days=n)) for n in range(6, -1, -1)]
+    dias_str = [d.strftime("%Y-%m-%d") for d in dias]
     tarefas_concluidas = []
     tarefas_pendentes = []
     habitos_concluidos = []
     habitos_pendentes = []
 
-    for n in range((fim_dt - inicio_dt).days + 1):
-        dia = inicio_dt + timedelta(days=n)
-        dias.append(dia.strftime("%Y-%m-%d"))
+    for dia in dias:
+        snap = HistoricoPendencias.query.filter_by(
+            usuario_id=usuario_id, data=dia).first()
+        if snap:
+            tarefas_pendentes.append(snap.tarefas_pendentes)
+            habitos_pendentes.append(snap.habitos_pendentes)
+            habitos_concluidos.append(snap.habitos_concluidos)
+        else:
+            tarefas_pendentes.append(0)
+            habitos_pendentes.append(0)
+            habitos_concluidos.append(0)
 
-        # Tarefas concluídas no dia
+        # Tarefas concluídas no dia (linha azul)
         concluidas = HistoricoAtividade.query.filter_by(
             usuario_id=usuario_id, tipo='tarefa', data=dia
         ).count()
         tarefas_concluidas.append(concluidas)
 
-        pendentes = Tarefa.query.filter(
-            Tarefa.usuario_id == usuario_id,
-            Tarefa.status == 'pendente',
-            Tarefa.prazo.isnot(None),
-            Tarefa.prazo <= dia
-        ).count()
-        tarefas_pendentes.append(pendentes)
-
-        # habitos_concl = HistoricoAtividade.query.filter_by(
-        #     usuario_id=usuario_id, tipo='habito', data=dia
+        # # Hábitos concluídos no dia (linha verde)
+        # registros_concluidos = RegistroHabito.query.join(Habito).filter(
+        #     Habito.usuario_id == usuario_id,
+        #     RegistroHabito.data == dia,
+        #     RegistroHabito.concluido == True
         # ).count()
-        # habitos_concluidos.append(habitos_concl)
-
-        registros_concluidos = RegistroHabito.query.join(Habito).filter(
-            Habito.usuario_id == usuario_id,
-            RegistroHabito.data == dia,
-            RegistroHabito.concluido == True
-        ).count()
-        habitos_concluidos.append(registros_concluidos)
-
-        registros_total = RegistroHabito.query.join(Habito).filter(
-            Habito.usuario_id == usuario_id,
-            RegistroHabito.data == dia
-        ).count()
-        habitos_pendentes.append(registros_total - registros_concluidos)
+        # habitos_concluidos.append(registros_concluidos)
 
     return jsonify({
-        "dias": dias,
+        "dias": dias_str,
         "tarefas": tarefas_concluidas,
         "tarefas_pendentes": tarefas_pendentes,
         "habitos_concluidos": habitos_concluidos,
