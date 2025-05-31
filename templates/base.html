@@ -11,56 +11,7 @@
   <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    let graficoProgresso = null;
 
-    function renderGraficoProgresso(tarefasConcluidas, tarefasPendentes, habitosConcluidos, habitosTotal) {
-      const ctx = document.getElementById('graficoProgresso');
-
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Tarefas Concluídas', 'Tarefas Pendentes', 'Hábitos Concluídos', 'Hábitos Pendentes'],
-          datasets: [{
-            label: 'Produtividade de Hoje',
-            data: [
-              tarefasConcluidas,
-              tarefasPendentes,
-              habitosConcluidos,
-              habitosTotal - habitosConcluidos
-            ],
-            backgroundColor: ['#198754', '#ffc107', '#0d6efd', '#dc3545']
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-        }
-      });
-    }
-
-    function atualizarGraficoProgresso() {
-      fetch('/dados_grafico')
-        .then(res => res.json())
-        .then(data => renderGraficoProgresso(
-          data.tarefas_concluidas,
-          data.tarefas_pendentes,
-          data.habitos_concluidos,
-          data.habitos_total
-        ));
-    }
-    //document.addEventListener('DOMContentLoaded', atualizarGraficoProdutividade);
-
-function atualizarGraficoProgresso() {
-  fetch('/dados_grafico')
-    .then(res => res.json())
-    .then(data => renderGraficoProgresso(
-      data.tarefas_concluidas,
-      data.tarefas_pendentes,
-      data.habitos_concluidos,
-      data.habitos_total
-    ));
-}
-    document.addEventListener('DOMContentLoaded', atualizarGraficoProgresso);
   </script>
   <style>
     body {
@@ -72,16 +23,16 @@ function atualizarGraficoProgresso() {
 <body>
   <div class="d-flex min-vh-100">
 
-
     <!-- Sidebar -->
     <nav class="sidebar bg-dark text-white p-4 d-flex flex-column justify-content-between">
       <div>
-        <h2 class="mb-4" style="font-weight: bold; letter-spacing: 2px;">
+        <h2 class="mb-2" style="font-weight: bold; letter-spacing: 2px;">
           <i class="bi bi-bar-chart-steps me-2"></i>Vida
           <br>
           <div>
-            <h3 class="mb-3 d-flex mt-auto me-3" style="font-weight:600; letter-spacing: 2px;">Analytics
+            <h3 class="mb-1 d-flex mt-auto me-3" style="font-weight:400; letter-spacing: 2px;">Analytics
             </h3>
+            <hr>
           </div>
         </h2>
         <ul class="nav flex-column gap-2">

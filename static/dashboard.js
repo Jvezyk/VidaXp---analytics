@@ -36,7 +36,6 @@ function ajaxForm(formSelector, urlRedirect) {
       .then(response => response.text())
       .then(() => {
         showToast("Adicionado com sucesso!");
-        atualizarGraficoProgresso();
         setTimeout(() => window.location.href = urlRedirect, 800);
       })
       .catch(err => {
@@ -68,12 +67,10 @@ function ajaxAction(linkSelector, urlRedirect, actionMsg) {
             setTimeout(() => {
               li.remove();
               showToast(actionMsg);
-              atualizarGraficoProgresso();
               setTimeout(() => window.location.href = urlRedirect, 500);
             }, 400);
           } else {
             showToast(actionMsg);
-            atualizarGraficoProgresso();
             setTimeout(() => window.location.href = urlRedirect, 500);
           }
         })
@@ -98,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
   ajaxForm('form[action*="adicionar_habito"]', '/habitos');
   ajaxAction('a[href*="concluir_habito"]', '/habitos', "Hábito concluído!");
   ajaxAction('a[href*="remover_habito"]', '/habitos', "Hábito removido!");
+  if (typeof atualizarGrafico === 'function') atualizarGrafico();
 });
 
 // Toast estilo CSS injetado

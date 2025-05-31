@@ -32,6 +32,7 @@ O **VidaXP** é um sistema web que permite aos estudantes universitários:
 ```
 VidaXp---analytics/
 ├── main.py   # Aplicação principal (Flask)
+├── popular_dados.py # Caso queira ver o gráfico sem esperar os dias
 ├── README.md  # Documentação do projeto
 ├── requirements.txt  # Dependências
 │

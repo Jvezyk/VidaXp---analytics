@@ -20,11 +20,47 @@
   </ul>
 
   {% if aba == 'dashboard' %}
-  <div class="row mb-4">
+  <script>
+    async function carregarLembretes() {
+      const resp = await fetch('/lembretes_pendentes');
+      const dados = await resp.json();
+      const lista = document.getElementById('listaLembretes');
+      const card = document.getElementById('cardLembretes');
+      const semLembretes = document.getElementById('semLembretes');
+      lista.innerHTML = '';
+      let temLembrete = false;
+      if (dados.tarefas.length) {
+        dados.tarefas.forEach(t => {
+          const li = document.createElement('li');
+          li.className = "list-group-item d-flex align-items-center";
+          li.innerHTML = `<span class="badge bg-primary me-2">Tarefa</span> ${t.titulo} <span class="badge bg-secondary ms-2">Prazo: ${t.prazo}</span>`;
+          lista.appendChild(li);
+          temLembrete = true;
+        });
+      }
+      if (dados.habitos.length) {
+        dados.habitos.forEach(h => {
+          const li = document.createElement('li');
+          li.className = "list-group-item d-flex align-items-center";
+          li.innerHTML = `<span class="badge bg-success me-2">Hábito</span> ${h}`;
+          lista.appendChild(li);
+          temLembrete = true;
+        });
+      }
+      card.style.display = 'block';
+      semLembretes.style.display = temLembrete ? 'none' : 'block';
+      lista.style.display = temLembrete ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', carregarLembretes);
+  </script>
+
+  <div class="row mb-2">
+    <!-- Mensagem de boas-vindas -->
     <div class="col-lg-6">
       <div class="card shadow border-0 rounded-4">
         <div class="card-body">
-          <h2 class="card-title mb-3"><i class="bi bi-bar-chart-steps me-2"></i>Bem-vindo ao Vida Analytics!</h2>
+          <h2 class="card-title mb-3 fw-bold "><i class="bi bi-bar-chart-steps me-2"></i>Bem-vindo ao Vida Analytics, {{usuario.nome }}!
+          </h2>
           <p class="card-text">Gerencie suas tarefas e hábitos, acompanhe seu progresso e evolua sua rotina!</p>
           <hr>
           <div class="d-flex gap-4">
@@ -40,151 +76,193 @@
         </div>
       </div>
     </div>
-
-    <!-- Gráfico de Progresso Diário -->
-    <div class="container py-5">
-      <div class="card shadow border-0 rounded-4">
-        <div class="card-header bg-info text-white rounded-top-4">
-          <h5 class="mb-0"><i class="bi bi-graph-up"></i> Progresso Diário</h5>
-        </div>
-        <div class="card-body">
-          <canvas id="graficoProgresso" height="100"></canvas>
-        </div>
-      </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      async function atualizarGrafico() {
-        const resp = await fetch('/dados_grafico_progresso');
-        const dados = await resp.json();
-        const ctx = document.getElementById('graficoProgresso').getContext('2d');
-        if (window.graficoProgresso) window.graficoProgresso.destroy();
-        window.graficoProgresso = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: dados.dias,
-            datasets: [
-              {
-                label: 'Tarefas concluídas',
-                data: dados.tarefas,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                tension: 0.3
-              },
-              {
-                label: 'Hábitos concluídos',
-                data: dados.habitos_concluidos,
-                borderColor: 'rgba(40, 167, 69, 1)',
-                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                tension: 0.3
-              },
-              {
-                label: 'Hábitos pendentes',
-                data: dados.habitos_pendentes,
-                borderColor: 'rgba(255, 193, 7, 1)',
-                backgroundColor: 'rgba(255, 193, 7, 0.2)',
-                tension: 0.3
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'top' },
-              title: { display: false }
-            }
-          }
-        });
-      }
-      document.addEventListener('DOMContentLoaded', atualizarGrafico);
-    </script>
-    {% elif aba == 'tarefas' %}
-    <div class="card shadow border-0 rounded-4">
-      <div class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Tarefas</h5>
-        <form action="{{ url_for('adicionar_tarefa') }}" method="POST" class="d-flex gap-2 mb-0">
-          <input name="titulo" class="form-control form-control-sm" placeholder="Nova tarefa" required>
-          <button class="btn btn-light btn-sm" title="Adicionar tarefa"><i class="bi bi-plus-lg"></i></button>
-        </form>
-      </div>
-
-      <!-- Lista de tarefas pendentes -->
-      <ul class="list-group list-group-flush">
-        {% set pendentes = tarefas | selectattr('status', 'equalto', 'pendente') | list %}
-        {% if pendentes %}
-        {% for t in pendentes %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>
-            <i class="bi bi-check2-circle me-1 text-success"></i>
-            {{ t.titulo }}
-          </span>
-          <div>
-            <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm"
-              title="Concluir"><i class="bi bi-check2"></i></a>
-            <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-              title="Remover"><i class="bi bi-trash"></i></a>
+    <!-- Card de lembretes -->
+    <div class="col-lg-6 me-lg-8">
+      <div id="cardLembretes" class="card shadow border-0 rounded-4 mb-2" style="display:none;">
+        <div class="card-body text-center">
+          <div class="mb-0">
+            <i class="bi bi-bell-fill text-warning" style="font-size: 2.5rem;"></i>
           </div>
-        </li>
-        {% endfor %}
-        {% else %}
-        <li class="list-group-item text-muted text-center">Nenhuma tarefa pendente.</li>
-        {% endif %}
-      </ul>
-
-      <!-- Seção de tarefas concluídas -->
-      <div class="px-3 pt-3">
-        <h6 class="text-muted mb-2"><i class="bi bi-check2-all"></i> Concluídas</h6>
-        <ul class="list-group list-group-flush">
-          {% set concluidas = tarefas | selectattr('status', 'equalto', 'concluída') | list %}
-          {% if concluidas %}
-          {% for t in concluidas %}
-          <li
-            class="list-group-item d-flex justify-content-between align-items-center text-success text-decoration-line-through">
-            <span>
-              <i class="bi bi-check2-circle me-1 text-success"></i>
-              {{ t.titulo }}
-            </span>
-            <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-              title="Remover"><i class="bi bi-trash"></i></a>
-          </li>
-          {% endfor %}
-          {% else %}
-          <li class="list-group-item text-muted text-center">Nenhuma tarefa concluída.</li>
-          {% endif %}
-        </ul>
-      </div>
-    </div>
-    {% elif aba == 'habitos' %}
-    <div class="card shadow border-0 rounded-4">
-      <div class="card-header bg-success text-white rounded-top-4 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-repeat me-2"></i>Hábitos</h5>
-        <form action="{{ url_for('adicionar_habito') }}" method="POST" class="d-flex gap-2 mb-0">
-          <input name="titulo" class="form-control form-control-sm" placeholder="Novo hábito" required>
-          <button class="btn btn-light btn-sm" title="Adicionar hábito"><i class="bi bi-plus-lg"></i></button>
-        </form>
-      </div>
-      <ul class="list-group list-group-flush">
-        {% for h in habitos %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span class="{% if h.status=='concluído' %}text-decoration-line-through text-success fw-semibold{% endif %}">
-            <i
-              class="bi bi-check2-circle me-1 {% if h.status=='concluído' %}text-success{% else %}text-secondary{% endif %}"></i>
-            {{ h.titulo }}
-          </span>
-          <div>
-            {% if h.status == 'pendente' %}
-            <a href="{{ url_for('concluir_habito', id=h.id) }}" class="btn btn-outline-success btn-sm"
-              title="Concluir"><i class="bi bi-check-lg"></i></a>
-            {% endif %}
-            <a href="{{ url_for('remover_habito', id=h.id) }}" class="btn btn-outline-danger btn-sm ms-1"
-              title="Remover"><i class="bi bi-trash"></i></a>
+          <h5 class="card-title mb-3 fw-bold text-warning">Lembretes de hoje</h5>
+          <hr>
+          <ul id="listaLembretes" class="list-group list-group-flush mb-0 ad"></ul>
+          <div id="semLembretes" class="text-muted mt-3" style="display:none;">
+            <i class="bi bi-emoji-smile"></i> Nenhuma pendência para hoje!
           </div>
-        </li>
-        {% else %}
-        <li class="list-group-item text-muted text-center">Nenhum hábito adicionado.</li>
-        {% endfor %}
-      </ul>
+        </div>
+      </div>
     </div>
-    {% endif %}
   </div>
-  {% endblock %}
+  <!-- Gráfico de Progresso Diário -->
+  <div class="container py-3">
+    <div class="card shadow border-0 rounded-4">
+      <div class="card-header bg-info text-white rounded-top-4">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-graph-up"></i> Quadro de Produtividade</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="graficoProgresso" height="100"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+          async function atualizarGrafico() {
+            console.log("Função atualizarGrafico chamada!");
+            const resp = await fetch('/dados_grafico_progresso');
+            const dados = await resp.json();
+            const ctx = document.getElementById('graficoProgresso').getContext('2d');
+            if (window.graficoProgresso && typeof window.graficoProgresso.destroy === 'function') {
+              window.graficoProgresso.destroy();
+            }
+            window.graficoProgresso = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: dados.dias,
+                datasets: [
+                  {
+                    label: 'Tarefas concluídas',
+                    data: dados.tarefas,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.3
+                  },
+                  {
+                    label: 'Tarefas pendente',
+                    data: dados.tarefas_pendentes,
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                    tension: 0.3
+                  },
+                  {
+                    label: 'Hábitos concluídos',
+                    data: dados.habitos_concluidos,
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    tension: 0.3
+                  }
+                  // {
+                  //   label: 'Hábitos pendentes',
+                  //   data: dados.habitos_pendentes,
+                  //   borderColor: 'rgba(255, 193, 7, 1)',
+                  //   backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                  //   tension: 0.3
+                  // }
+                ]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: false }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      stepSize: 1,
+                      precision: 0,
+                      callback: function (value) {
+                        return Number.isInteger(value) ? value : null;
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
+          document.addEventListener('DOMContentLoaded', atualizarGrafico);
+        </script>
+        {% elif aba == 'tarefas' %}
+        <div class="card shadow border-0 rounded-4">
+          <div
+            class="card-header bg-primary text-white rounded-top-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-list-task me-2"></i>Tarefas</h5>
+            <form action="{{ url_for('adicionar_tarefa') }}" method="POST" class="d-flex gap-2 mb-0">
+              <input name="titulo" class="form-control form-control-sm" placeholder="Nova tarefa" required>
+              <input name="prazo" type="date" class="form-control form-control-sm" placeholder="Prazo" required>
+              <button class="btn btn-light btn-sm" title="Adicionar tarefa"><i class="bi bi-plus-lg"></i></button>
+            </form>
+          </div>
+
+          <!-- Lista de tarefas pendentes -->
+          <ul class="list-group list-group-flush">
+            {% set pendentes = tarefas | selectattr('status', 'equalto', 'pendente') | list %}
+            {% if pendentes %}
+            {% for t in pendentes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                <i class="bi bi-check2-circle me-1 text-success"></i>
+                {{ t.titulo }}
+                {% if t.prazo %}
+                <span class="badge bg-secondary ms-2">Prazo: {{ t.prazo.strftime('%d/%m/%Y') }}</span>
+                {% endif %}
+              </span>
+              <div>
+                <a href="{{ url_for('concluir_tarefa', id=t.id) }}" class="btn btn-outline-success btn-sm"
+                  title="Concluir"><i class="bi bi-check2"></i></a>
+                <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+                  title="Remover"><i class="bi bi-trash"></i></a>
+              </div>
+            </li>
+            {% endfor %}
+            {% else %}
+            <li class="list-group-item text-muted text-center">Nenhuma tarefa pendente.</li>
+            {% endif %}
+          </ul>
+
+          <!-- Seção de tarefas concluídas -->
+          <div class="px-3 pt-3">
+            <h6 class="text-muted mb-2"><i class="bi bi-check2-all"></i> Concluídas</h6>
+            <ul class="list-group list-group-flush">
+              {% set concluidas = tarefas | selectattr('status', 'equalto', 'concluída') | list %}
+              {% if concluidas %}
+              {% for t in concluidas %}
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center text-success text-decoration-line-through">
+                <span>
+                  <i class="bi bi-check2-circle me-1 text-success"></i>
+                  {{ t.titulo }}
+                </span>
+                <a href="{{ url_for('remover_tarefa', id=t.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+                  title="Remover"><i class="bi bi-trash"></i></a>
+              </li>
+              {% endfor %}
+              {% else %}
+              <li class="list-group-item text-muted text-center">Nenhuma tarefa concluída.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+        {% elif aba == 'habitos' %}
+        <div class="card shadow border-0 rounded-4">
+          <div
+            class="card-header bg-success text-white rounded-top-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-repeat me-2"></i>Hábitos</h5>
+            <form action="{{ url_for('adicionar_habito') }}" method="POST" class="d-flex gap-2 mb-0">
+              <input name="titulo" class="form-control form-control-sm" placeholder="Novo hábito" required>
+              <button class="btn btn-light btn-sm" title="Adicionar hábito"><i class="bi bi-plus-lg"></i></button>
+            </form>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for h in habitos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span
+                class="{% if h.status=='concluído' %}text-decoration-line-through text-success fw-semibold{% endif %}">
+                <i
+                  class="bi bi-check2-circle me-1 {% if h.status=='concluído' %}text-success{% else %}text-secondary{% endif %}"></i>
+                {{ h.titulo }}
+              </span>
+              <div>
+                {% if h.status == 'pendente' %}
+                <a href="{{ url_for('concluir_habito', id=h.id) }}" class="btn btn-outline-success btn-sm"
+                  title="Concluir"><i class="bi bi-check-lg"></i></a>
+                {% endif %}
+                <a href="{{ url_for('remover_habito', id=h.id) }}" class="btn btn-outline-danger btn-sm ms-1"
+                  title="Remover"><i class="bi bi-trash"></i></a>
+              </div>
+            </li>
+            {% else %}
+            <li class="list-group-item text-muted text-center">Nenhum hábito adicionado.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+      {% endblock %}
