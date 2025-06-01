@@ -72,7 +72,6 @@ python main.py
 
 # 3. Acesse no navegador
 http://localhost:5000
-
 ```
 
 ##  Autor
