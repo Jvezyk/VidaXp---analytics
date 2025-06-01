@@ -33,7 +33,7 @@ O **Vida Analystics** é um sistema web que permite aos estudantes universitári
 VidaXp---analytics/
 ├── main.py   # Aplicação principal (Flask)
 ├── popular_dados.py # Caso queira ver o gráfico sem esperar os dias
-├── Procfile # Arquivo para o Render
+├── Procfile # Arquivo para o Render(Futuramente)
 ├── README.md  # Documentação do projeto
 ├── requirements.txt  # Dependências
 │
@@ -54,7 +54,7 @@ VidaXp---analytics/
 │ ├── tarefa.py
 │ └── habito.py
 │
-├── instance/ # Banco de dados local (SQL)
+├── instance/ # Banco de dados local (SQLAlchemy)
 └── vidaxp.db
 ```
 ---
