@@ -1,6 +1,6 @@
 # 🌱 Vida Analystics – Assistente de Organização Acadêmica
 
-Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário. O Projeto se encontra na forma simples, tendo poucas funcionalidades mas com grande chances de ser melhorado no futuro.
+Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário. Esta é uma versão inicial, com funcionalidades básicas, mas com grande potencial de evolução futura.
 
 ---
 
@@ -10,7 +10,7 @@ O **Vida Analystics** é um sistema web que permite aos estudantes universitári
 
 - Organizar tarefas e hábitos acadêmicos
 - Visualizar o status das atividades
-- Ver o seu desempenho diário por meio de um gráfico
+- Analisar o desempenho diário por meio de um gráfico
 - Marcar itens como concluídos
 - Navegar por uma interface limpa e responsiva (desenvolvida com Flask + Bootstrap)
 
@@ -64,5 +64,18 @@ VidaXp---analytics/
 `Bash:`
 
 ```
+# 1. Instale as dependências
 pip install -r requirements.txt
+
+# 2. Execute a aplicação
+python main.py
+
+# 3. Acesse no navegador
+http://localhost:5000
+
 ```
+
+##  Autor
+
+- [João Vitor Justo Gonçalves](https://github.com/Jvezyk/VidaXp---analytics)  
+- Projeto desenvolvido na disciplina de Programação Orientada a Objetos – [Universidade Federal de Brasília]
