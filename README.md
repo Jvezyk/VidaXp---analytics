@@ -54,7 +54,7 @@ VidaXp---analytics/
 │ ├── tarefa.py
 │ └── habito.py
 │
-├── instance/ # Banco de dados local (SQLAlchemy)
+├── instance/ # Banco de dados local (SQLite)
 └── vidaxp.db
 ```
 ---
