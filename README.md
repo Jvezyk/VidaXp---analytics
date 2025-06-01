@@ -6,7 +6,7 @@ Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**,
 
 ##  Objetivo
 
-O **VidaXP** é um sistema web que permite aos estudantes universitários:
+O **Vida Analystics** é um sistema web que permite aos estudantes universitários:
 
 - Organizar tarefas e hábitos acadêmicos
 - Visualizar o status das atividades
