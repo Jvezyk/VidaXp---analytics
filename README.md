@@ -77,4 +77,4 @@ http://localhost:5000
 ##  Autor
 
 - [João Vitor Justo Gonçalves](https://github.com/Jvezyk/VidaXp---analytics)  
-- Projeto desenvolvido na disciplina de Programação Orientada a Objetos – [Universidade Federal de Brasília]
+- Projeto desenvolvido na disciplina de Orientação a Objetos – [Universidade Federal de Brasília]
