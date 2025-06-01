@@ -297,9 +297,27 @@ def concluir_habito(id):
     snap = HistoricoPendencias.query.filter_by(
         usuario_id=habito.usuario_id, data=hoje).first()
     if snap:
-        db.session.delete(snap)
+        # Atualiza os campos do snapshot
+        snap.tarefas_pendentes = Tarefa.query.filter(
+            Tarefa.usuario_id == habito.usuario_id,
+            Tarefa.status == 'pendente',
+            Tarefa.prazo.isnot(None),
+            Tarefa.prazo <= hoje
+        ).count()
+        registros_total = RegistroHabito.query.join(Habito).filter(
+            Habito.usuario_id == habito.usuario_id,
+            RegistroHabito.data == hoje
+        ).count()
+        registros_concluidos = RegistroHabito.query.join(Habito).filter(
+            Habito.usuario_id == habito.usuario_id,
+            RegistroHabito.data == hoje,
+            RegistroHabito.concluido == True
+        ).count()
+        snap.habitos_pendentes = registros_total - registros_concluidos
+        snap.habitos_concluidos = registros_concluidos
         db.session.commit()
-    registrar_snapshot_pendencias(habito.usuario_id, hoje)
+    else:
+        registrar_snapshot_pendencias(habito.usuario_id, hoje)
     return redirect(url_for("habitos"))
 
 
@@ -382,25 +400,20 @@ def dados_grafico_progresso():
         if snap:
             tarefas_pendentes.append(snap.tarefas_pendentes)
             habitos_pendentes.append(snap.habitos_pendentes)
-            habitos_concluidos.append(snap.habitos_concluidos)
         else:
             tarefas_pendentes.append(0)
             habitos_pendentes.append(0)
-            habitos_concluidos.append(0)
 
         # Tarefas concluídas no dia (linha azul)
         concluidas = HistoricoAtividade.query.filter_by(
-            usuario_id=usuario_id, tipo='tarefa', data=dia
+        usuario_id=usuario_id, tipo='tarefa', data=dia
         ).count()
         tarefas_concluidas.append(concluidas)
 
-        # # Hábitos concluídos no dia (linha verde)
-        # registros_concluidos = RegistroHabito.query.join(Habito).filter(
-        #     Habito.usuario_id == usuario_id,
-        #     RegistroHabito.data == dia,
-        #     RegistroHabito.concluido == True
-        # ).count()
-        # habitos_concluidos.append(registros_concluidos)
+        # Hábitos concluídos no dia (linha verde)
+        habitos_concluidos_dia = HistoricoAtividade.query.filter_by(
+        usuario_id=usuario_id, tipo='habito', data=dia).count()
+        habitos_concluidos.append(habitos_concluidos_dia)
 
     return jsonify({
         "dias": dias_str,
