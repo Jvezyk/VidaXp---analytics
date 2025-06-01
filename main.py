@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vidaxp.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = "um_valor_bem_secreto_e_unico"
+app.secret_key = "40aa74d4a6734e10e89e5eeafac4412f9054dd85f727d0a5bec2b8063604526e"
 db = SQLAlchemy(app)
 
 # Modelos do banco
