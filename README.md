@@ -1,4 +1,4 @@
-# 🌱 Vida Analystics – Assistente de Organização Acadêmica
+#  Vida Analystics – Assistente de Organização Acadêmica
 
 Projeto desenvolvido para a disciplina de **Programação Orientada a Objetos**, com o objetivo de aplicar conceitos como herança, composição, abstração, modularização, e interface com o usuário. Esta é uma versão inicial, com funcionalidades básicas, mas com grande potencial de evolução futura.
 
